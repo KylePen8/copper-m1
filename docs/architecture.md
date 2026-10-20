@@ -86,3 +86,34 @@ When a module changes how the app fits together, add a section here:
 **Risks and open questions:** cost, privacy, accuracy or safety risks, and how
 you handle them.
 ```
+
+## Module 1: Landing page
+
+**Summary:** Replaces the placeholder home page with one landing page that shows
+the products, Copper Plus pricing and the 2026 privacy policy. Every price, plan
+detail and privacy fact is read from the catalog, never typed into the page.
+
+| Piece | Where | What it does |
+|---|---|---|
+| Page / route | `app/page.tsx` | The only route, `/`. Seven sections in order: header, hero, products, showcase, Copper Plus pricing, privacy, footer |
+| Components | `components/copper/site-header.tsx`, `site-footer.tsx` | Sticky header with links to `#products`, `#plus` and `#privacy`; Night Sky footer with the logo |
+| Data | `lib/copper/catalog.ts` | `getProducts()`, `getPlans()` and `getPrivacySummary()`, formatted with `formatUsd()`, `formatMemory()` and `formatNotesHours()` |
+| Images | `public/assets/{cutouts,lifestyle,brand}/` | Product cutouts, lifestyle photos and the mascot, moved from `specs/module-1/assets/`. All shown through `next/image` |
+| AI calls | none | |
+
+**Data flow:** request for `/` → server component reads the catalog (static JSON)
+→ prerendered HTML. There is no database, API call or client-side data fetching.
+
+**Decisions and trade-offs:**
+- Only theme tokens are used for color (`bg-primary`, `bg-secondary`, `bg-accent`,
+  `bg-foreground`), so light and dark mode both work with no hex values in code.
+- Catalog image paths are strings, so lifestyle photos use `fill` with
+  `object-cover` in a fixed 16:10 box, and cutouts use their 1254×1254 size.
+- Header links wrap to a second row on phones instead of a hamburger menu, which
+  needs no client JavaScript.
+- The footer always uses the light wordmark, because its background is dark in
+  both themes.
+
+**Risks and open questions:** The privacy text is the catalog's wording rendered
+as-is, so it is only as accurate as the catalog. Color names on the product cards
+are text chips because the catalog has no color values.
